@@ -22,7 +22,13 @@ final class QuestionViewController: UIViewController {
     
     @IBOutlet var rangedStackView: UIStackView!
     @IBOutlet var rangedLabels: [UILabel]!
-    @IBOutlet var rangedSlider: UISlider!
+    @IBOutlet var rangedSlider: UISlider! {
+        didSet {
+            let answerCount = Float(currentAnswers.count - 1)
+            rangedSlider.maximumValue = answerCount
+            rangedSlider.value = answerCount / 2
+        }
+    }
     
     // MARK: - Private Properties
     private let questions = Question.getQuestions()
@@ -35,20 +41,20 @@ final class QuestionViewController: UIViewController {
     // MARK: - View Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         updateUI()
-        
-        let answerCount = Float(currentAnswers.count - 1)
-        rangedSlider.maximumValue = answerCount
-        rangedSlider.value = answerCount / 2
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let resultVC = segue.destination as? ResultViewController else { return }
+        resultVC.answers = answersChosen
     }
 
 
     // MARK: - IBActions
     @IBAction func singleAnswerButtonPressed(_ sender: UIButton) {
         guard let buttonIndex = singleButtons.firstIndex(of: sender) else { return }
-        let currentAnswer = currentAnswers[buttonIndex]
-        answersChosen.append(currentAnswer)
+        let answer = currentAnswers[buttonIndex]
+        answersChosen.append(answer)
         
         goToNextQuestion()
     }
